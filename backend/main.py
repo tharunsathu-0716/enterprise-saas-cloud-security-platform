@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from db.database import Base
 from db.database import engine
+from api.auth import router as auth_router
 
 import models.user
 
@@ -12,6 +13,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.include_router(auth_router)
 
 @app.get("/")
 def root():

@@ -10,3 +10,4 @@ pydantic
 python-dotenv
 alembic
 redis
+email-validator
