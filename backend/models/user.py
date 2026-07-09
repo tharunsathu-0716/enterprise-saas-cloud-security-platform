@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import Column
 from sqlalchemy import String
+from sqlalchemy import ForeignKey
 
 from db.database import Base
 
@@ -28,6 +29,12 @@ class User(Base):
     )
 
     role = Column(
+    String,
+    default="Viewer"
+    )
+
+    organization_id = Column(
         String,
-        default="Viewer"
+        ForeignKey("organizations.id"),
+        nullable=True
     )

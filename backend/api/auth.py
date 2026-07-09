@@ -15,6 +15,10 @@ from core.security import verify_password
 from core.security import create_access_token
 
 from core.dependencies import get_current_user
+from core.rbac import require_role
+
+from models.security_event import SecurityEvent
+
 
 router = APIRouter(
     prefix="/auth",
@@ -48,6 +52,15 @@ def register(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    event = SecurityEvent(
+        event_type="USER_CREATED",
+        user_email=new_user.email,
+        description="New user registered"
+    )
+
+    db.add(event)
+    db.commit()
 
     return {
         "message": "User created successfully",
@@ -91,6 +104,15 @@ def login(
         }
     )
 
+    event = SecurityEvent(
+        event_type="LOGIN_SUCCESS",
+        user_email=user.email,
+        description="User logged in successfully"
+    )
+
+    db.add(event)
+    db.commit()
+
     return {
         "access_token": access_token,
         "token_type": "bearer"
@@ -113,4 +135,34 @@ def debug_token(
 ):
     return {
         "authorization": authorization
+    }
+
+@router.get("/admin-dashboard")
+def admin_dashboard(
+    current_user=Depends(
+        require_role("Admin")
+    )
+):
+    return {
+        "message": "Welcome Admin"
+    }
+
+@router.get("/security-events")
+def security_events(
+    current_user=Depends(
+        require_role("SecurityAnalyst")
+    )
+):
+    return {
+        "message": "Security Events Dashboard"
+    }
+
+@router.get("/reports")
+def reports(
+    current_user=Depends(
+        require_role("Viewer")
+    )
+):
+    return {
+        "message": "Reports Access Granted"
     }

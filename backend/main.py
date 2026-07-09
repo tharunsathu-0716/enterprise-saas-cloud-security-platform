@@ -5,6 +5,9 @@ from db.database import engine
 from api.auth import router as auth_router
 
 import models.user
+import models.organization
+import models.security_event
+
 
 Base.metadata.create_all(bind=engine)
 
